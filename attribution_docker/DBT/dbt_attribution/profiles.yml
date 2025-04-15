@@ -1,0 +1,10 @@
+dbt_attribution:
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      method: oauth
+      project: ft-customer-analytics
+      dataset: crg_nniu
+      threads: 4
+      timeout_seconds: 300

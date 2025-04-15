@@ -1,0 +1,152 @@
+#copy and paste below pip install packages to seperate cells for packages installation. Ignore if packages already installed
+#pip install markovclick # Required package
+#pip install marketing_attribution_models # Required package
+#pip install pandas==1.3.3 matplotlib==3.4.3 seaborn==0.11.2
+
+# Import libraries
+from marketing_attribution_models import MAM
+import pandas as pd
+import numpy as np
+from collections import defaultdict
+import matplotlib.pyplot as plt
+from markovclick.models import MarkovClickstream
+from markovclick.viz import visualise_markov_chain
+import os
+import graphviz
+import matplotlib as mpl
+from pandas.io import gbq
+import pandas_gbq
+import glob
+from pylab import *
+import tempfile
+import json
+from datetime import timedelta
+import seaborn as sns
+import gc
+from datetime import datetime
+import re
+from google.cloud import bigquery
+
+
+################################################# Data Loading  #########################################
+
+project = 'ft-customer-analytics'
+location = 'EU'
+client = bigquery.Client(project=project, location=location)
+
+client = bigquery.Client(project='ft-customer-analytics')
+
+
+table_id = 'ft-customer-analytics.crg_nniu.conversion_visit_static_90'
+
+
+###################### Specify the date range for conversion_visit_timestamp in SQL Query below for desired timeframe to load historical data, example set to 1st July 2024 - 13th July 2024 #########################################
+
+query = f"""
+SELECT * FROM {table_id}
+WHERE DATE(conversion_visit_timestamp) BETWEEN "2023-01-01" AND "2024-12-07" 
+"""
+
+query_job = client.query(query)
+
+df = query_job.to_dataframe()
+
+ids = 'user_guid'
+date = 'attribution_visit_start_time'
+touchpoint = 'touchpoint'
+transaction = 'converting_visit'
+
+trial_df = df[df["conversion_type"] == "Trial"]
+sub_df = df[df["conversion_type"] == "Subscription"]
+#registration_df = df[df["conversion_type"] == "Registration"]
+
+trial_df = trial_df.drop(columns=["conversion_type"])
+sub_df = sub_df.drop(columns=["conversion_type"])
+#registration_df = registration_df.drop(columns=["conversion_type"])
+
+df_ = df[df["converting_visit"] == 1]
+df_country_product_user_status = df[["user_guid", "conversion_visit_timestamp", "b2c_product_type", "product_arrangement_id", "b2c_product_name_and_term"]]
+
+df_country_product_user_status = df_country_product_user_status.loc[
+    df_country_product_user_status.groupby("user_guid")["conversion_visit_timestamp"].idxmax()
+].reset_index(drop=True)
+
+df_country_product_user_status["conversion_visit_timestamp"] = pd.to_datetime(
+    df_country_product_user_status["conversion_visit_timestamp"]
+).dt.date
+
+trial = trial_df[trial_df[transaction] == 1]
+subscriber = sub_df[sub_df[transaction] == 1]
+
+def calculate_median_time_to_subscribe_by_date(stage_df, reference_df, ids, date_column, stage_name):
+    # Convert timestamps to dates
+    stage_df['conversion_date'] = stage_df[date_column].dt.normalize()
+    reference_df['reference_date'] = reference_df[date_column].dt.normalize()
+    
+    # Find the earliest conversion and reference date per user
+    stage_min_date = stage_df.groupby(ids)['conversion_date'].min()
+    reference_min_date = reference_df.groupby(ids)['reference_date'].min()
+    
+    # Calculate time to subscribe
+    time_to_subscribe = (stage_min_date - reference_min_date).dt.days
+    
+    # Filter users who converted in at least 1 day
+    filtered_time_to_subscribe = time_to_subscribe[time_to_subscribe >= 1]
+    merged = stage_df.set_index(ids).join(filtered_time_to_subscribe.rename('time_to_subscribe'), on=ids)
+    
+    # Calculate median time-to-subscribe for each conversion date
+    median_days_by_date = merged.groupby('conversion_date')['time_to_subscribe'].median().reset_index()
+    median_days_by_date.columns = ['run_date', 'median_days']
+    median_days_by_date['stage'] = stage_name  # Add the stage name
+    
+    return median_days_by_date
+
+# List of stages
+stages = [
+    ("trial", trial, trial_df),
+    ("subscriber", subscriber, sub_df)
+    #,("registration", registration, registration_df)
+]
+
+# Calculate median days to conversion for each stage and date
+conversion_window_by_date_df = pd.concat(
+    [calculate_median_time_to_subscribe_by_date(stage_df, ref_df, ids, date, stage_name)
+     for stage_name, stage_df, ref_df in stages],
+    ignore_index=True
+)
+
+
+# Delete df to release memory
+del df
+gc.collect()
+
+
+# ################################################ Upload data to BQ #########################################
+
+# Configure the load job
+job_config = bigquery.LoadJobConfig(
+    write_disposition=bigquery.WriteDisposition.WRITE_TRUNCATE, # WRITE_TRUNCATE. # WRITE_APPEND
+    source_format=bigquery.SourceFormat.PARQUET,
+    autodetect=True,
+    time_partitioning=bigquery.TimePartitioning(
+        type_=bigquery.TimePartitioningType.DAY,
+        field="run_date"
+    )
+)
+
+dataframes = {
+    'ft-customer-analytics.crg_nniu.historical_conversion_window_by_date_df': conversion_window_by_date_df
+}
+
+for destination_table, dataframe in dataframes.items():
+    try:
+        load_job = client.load_table_from_dataframe(
+            dataframe,
+            destination_table,
+            job_config=job_config
+        )
+        load_job.result()
+        print(f"Load job for {destination_table} completed successfully.")
+    except Exception as e:
+        print(f"Error loading data to {destination_table}: {e}")
+

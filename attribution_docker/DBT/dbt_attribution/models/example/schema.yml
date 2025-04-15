@@ -1,0 +1,13 @@
+version: 2
+
+sources:
+  - name: bq_views
+    database: ft-customer-analytics
+    schema: crg_nniu
+    tables:
+      - name: historical_ltv
+        columns:
+          - name: ltv_acquisition_capped_12m
+            tests:
+              - unique
+              - not_null
