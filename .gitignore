@@ -15,3 +15,6 @@ dbt_core/dbt_packages/
 logs/
 .DS_Store
 
+# Large files
+*.tar
+*.csv
