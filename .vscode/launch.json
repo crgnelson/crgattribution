@@ -1,0 +1,29 @@
+// {
+//   "version": "0.2.0",
+//   "configurations": [
+//     {
+//       "name": "Run Attribution - Trial (30 days)",
+//       "type": "python",
+//       "request": "launch",
+//       "program": "${workspaceFolder}/attribution_docker/main_modular.py",
+//       "env": {
+//         "CONVERSION_TYPE": "Trial",
+//         "LOOKBACK_WINDOW": "30"
+//       },
+//       "console": "integratedTerminal"
+//     }
+//   ]
+// }
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run All Attribution Variants",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/attribution_docker/main_modular.py",
+      "console": "integratedTerminal"
+    }
+  ]
+}
+

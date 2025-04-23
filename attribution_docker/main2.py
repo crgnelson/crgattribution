@@ -42,7 +42,7 @@ start_date = end_date - pd.DateOffset(days=14)
 start_date = start_date.date()
 end_date = end_date.date() 
 
-table_id = "ft-customer-analytics.crg_nniu.stg_conversion_users_last_15_days_90_days_lookback_table"
+table_id = "ft-customer-analytics.crg_nniu_attribution.stg_conversion_users_last_15_days_90_days_lookback_table"
 
 ################################################# Output DataFrames  #################################################
 
@@ -261,7 +261,7 @@ user_df_all_subs_90["conversion_type"] = "Subscription"
 
 ################################################################################################## Sub 60 days ##########################################################################################
 
-table_id = "ft-customer-analytics.crg_nniu.stg_conversion_users_last_15_days_60_days_lookback_table"
+table_id = "ft-customer-analytics.crg_nniu_attribution.stg_conversion_users_last_15_days_60_days_lookback_table"
 
 attribution_df_all_subs_60 = pd.DataFrame()
 normalized_removal_effects_all_subs_60 = pd.DataFrame()
@@ -430,7 +430,7 @@ user_df_all_subs_60["conversion_type"] = "Subscription"
 
 ################################################################################################## Sub 30 days ##########################################################################################
 
-table_id = "ft-customer-analytics.crg_nniu.stg_conversion_users_last_15_days_30_days_lookback_table"
+table_id = "ft-customer-analytics.crg_nniu_attribution.stg_conversion_users_last_15_days_30_days_lookback_table"
 
 attribution_df_all_subs_30 = pd.DataFrame()
 normalized_removal_effects_all_subs_30 = pd.DataFrame()
@@ -636,7 +636,7 @@ attribution_df_all_subs["conversion_type"] = "Subscription"
 
 
 ############################################################################################## Trial 90 days ##########################################################################################
-table_id = "ft-customer-analytics.crg_nniu.stg_conversion_users_last_15_days_90_days_lookback_table"
+table_id = "ft-customer-analytics.crg_nniu_attribution.stg_conversion_users_last_15_days_90_days_lookback_table"
 
 attribution_df_all_trial_90 = pd.DataFrame()
 normalized_removal_effects_all_trial_90 = pd.DataFrame()
@@ -847,7 +847,7 @@ markov_transition_matrix_all_trial_90["conversion_type"] = "Trial"
 user_df_all_trial_90["conversion_type"] = "Trial"
 
 ############################################################################################## Trial 60 days ##########################################################################################
-table_id = "ft-customer-analytics.crg_nniu.stg_conversion_users_last_15_days_60_days_lookback_table"
+table_id = "ft-customer-analytics.crg_nniu_attribution.stg_conversion_users_last_15_days_60_days_lookback_table"
 
 attribution_df_all_trial_60 = pd.DataFrame()
 normalized_removal_effects_all_trial_60 = pd.DataFrame()
@@ -1015,7 +1015,7 @@ user_df_all_trial_60["conversion_type"] = "Trial"
 
 ############################################################################################## Trial 30 days ##########################################################################################
 
-table_id = "ft-customer-analytics.crg_nniu.stg_conversion_users_last_15_days_30_days_lookback_table"
+table_id = "ft-customer-analytics.crg_nniu_attribution.stg_conversion_users_last_15_days_30_days_lookback_table"
 
 attribution_df_all_trial_30 = pd.DataFrame()
 normalized_removal_effects_all_trial_30 = pd.DataFrame()
@@ -1219,7 +1219,7 @@ attribution_df_all_trial["conversion_type"] = "Trial"
 
 ############################################################################################## Regis 90 days ##########################################################################################
 
-table_id = "ft-customer-analytics.crg_nniu.stg_conversion_users_last_15_days_90_days_lookback_table"
+table_id = "ft-customer-analytics.crg_nniu_attribution.stg_conversion_users_last_15_days_90_days_lookback_table"
 
 attribution_df_all_regis_90 = pd.DataFrame()
 normalized_removal_effects_all_regis_90 = pd.DataFrame()
@@ -1436,7 +1436,7 @@ user_df_all_regis_90["conversion_type"] = "registration"
 
 
 ############################################################################################## Regis 60 days ##########################################################################################
-table_id = "ft-customer-analytics.crg_nniu.stg_conversion_users_last_15_days_60_days_lookback_table"
+table_id = "ft-customer-analytics.crg_nniu_attribution.stg_conversion_users_last_15_days_60_days_lookback_table"
 
 attribution_df_all_regis_60 = pd.DataFrame()
 normalized_removal_effects_all_regis_60 = pd.DataFrame()
@@ -1653,7 +1653,7 @@ user_df_all_regis_60["conversion_type"] = "registration"
 
 
 ############################################################################################## Regis 30 days ##########################################################################################
-table_id = "ft-customer-analytics.crg_nniu.stg_conversion_users_last_15_days_30_days_lookback_table"
+table_id = "ft-customer-analytics.crg_nniu_attribution.stg_conversion_users_last_15_days_30_days_lookback_table"
 
 attribution_df_all_regis_30 = pd.DataFrame()
 normalized_removal_effects_all_regis_30 = pd.DataFrame()
@@ -2204,11 +2204,11 @@ job_config = bigquery.LoadJobConfig(
 )
 
 dataframes = {
-    "ft-customer-analytics.crg_nniu.attribution_markov_transition_matrix_all": markov_transition_matrix_all,
-    "ft-customer-analytics.crg_nniu.attribution_normalized_removal_effects_all": normalized_removal_effects_all,
-    "ft-customer-analytics.crg_nniu.attribution_user_df_all": user_df_all,
-    "ft-customer-analytics.crg_nniu.attribution_df_all": attribution_df_all,
-    "ft-customer-analytics.crg_nniu.attribution_conversion_window_df": conversion_window_df
+    "ft-customer-analytics.crg_nniu_attribution.attribution_markov_transition_matrix_all": markov_transition_matrix_all,
+    "ft-customer-analytics.crg_nniu_attribution.attribution_normalized_removal_effects_all": normalized_removal_effects_all,
+    "ft-customer-analytics.crg_nniu_attribution.attribution_user_df_all": user_df_all,
+    "ft-customer-analytics.crg_nniu_attribution.attribution_df_all": attribution_df_all,
+    "ft-customer-analytics.crg_nniu_attribution.attribution_conversion_window_df": conversion_window_df
 }
 
 for destination_table, dataframe in dataframes.items():

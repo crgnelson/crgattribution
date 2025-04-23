@@ -41,8 +41,14 @@ start_date = end_date - pd.DateOffset(days=14)
 start_date = start_date.date()
 end_date = end_date.date()
 
-table_id = f"ft-customer-analytics.crg_nniu.conversion_users_last_15_days_{lookback_window}_days_lookback_table"
 ltv_table_id = "ft-customer-analytics.crg_nniu.ltv_last_15_days"
+
+def table_exists(client, table_id):
+    try:
+        client.get_table(table_id)
+        return True
+    except Exception:
+        return False
 
 def calculate_removal_effect(row):
     attr = row.get("attribution_markov_algorithmic")
@@ -77,6 +83,7 @@ def sanitize_column_name(col_name):
     return sanitized
 
 def run_pipeline(conversion_type, lookback_window):
+    table_id = f"ft-customer-analytics.crg_nniu.conversion_users_last_15_days_{lookback_window}_days_lookback_table"
     user_df_all = pd.DataFrame()
     attribution_df_all = pd.DataFrame()
     markov_matrix_all = pd.DataFrame()
@@ -195,22 +202,69 @@ def run_pipeline(conversion_type, lookback_window):
 
     user_df_all = user_df_all.drop_duplicates()
 
-    print(f"\n📤 Uploading to BigQuery...")
+    print(f"\n📤 Uploading all outputs to BigQuery...")
+    # Define job config
     job_config = bigquery.LoadJobConfig(
-        write_disposition=bigquery.WriteDisposition.WRITE_TRUNCATE,
+        write_disposition=bigquery.WriteDisposition.WRITE_APPEND,
         source_format=bigquery.SourceFormat.PARQUET,
         autodetect=True,
-        time_partitioning=bigquery.TimePartitioning(type_=bigquery.TimePartitioningType.DAY, field="run_date")
+        time_partitioning=bigquery.TimePartitioning(
+            type_=bigquery.TimePartitioningType.DAY,
+            field="run_date"
+        )
     )
 
-    client.load_table_from_dataframe(
-        user_df_all.reset_index(drop=True),
-        "ft-customer-analytics.crg_nniu_attribution.test_attribution_user_df_all",
-        job_config=job_config
-    ).result()
-    print("✅ Upload complete.")
+    dataframes = {
+        "ft-customer-analytics.crg_nniu_attribution.test_attribution_user_df_all": user_df_all,
+        "ft-customer-analytics.crg_nniu_attribution.test_attribution_channel_level": attribution_df_all,
+        "ft-customer-analytics.crg_nniu_attribution.test_attribution_markov_matrix": markov_matrix_all,
+        "ft-customer-analytics.crg_nniu_attribution.test_attribution_removal_effects": removal_effects_all,
+    }
+
+    for destination_table, df in dataframes.items():
+        if df.empty:
+            print(f"⚠️ Skipping {destination_table} — empty DataFrame.")
+            continue
+
+        table_is_ready = table_exists(client, destination_table)
+
+        if table_is_ready:
+            run_dates = pd.to_datetime(df["run_date"].dropna().unique()).astype(str)
+            for run_date in run_dates:
+                delete_query = f"""
+                DELETE FROM `{destination_table}`
+                WHERE run_date = DATE('{run_date}')
+                AND conversion_type = '{conversion_type}'
+                AND conversion_window = {lookback_window}
+                """
+                try:
+                    client.query(delete_query).result()
+                    print(f"🧹 Cleared data for {run_date} in {destination_table}")
+                except Exception as e:
+                    print(f"⚠️ Could not delete partition {run_date} from {destination_table}: {e}")
+        else:
+            print(f"📁 Table not found — skipping delete for {destination_table}. It will be created on upload.")
+
+        try:
+            client.load_table_from_dataframe(df.reset_index(drop=True), destination_table, job_config=job_config).result()
+            print(f"✅ Uploaded data to {destination_table}")
+        except Exception as e:
+            print(f"❌ Upload failed for {destination_table}: {e}")
+
+
+# if __name__ == "__main__":
+#     if conversion_type not in ["Trial", "Subscription"] or lookback_window not in [30, 60, 90]:
+#         raise ValueError(f"Invalid configuration: {conversion_type} / {lookback_window}")
+#     run_pipeline(conversion_type, lookback_window)
 
 if __name__ == "__main__":
-    if conversion_type not in ["Trial", "Subscription"] or lookback_window not in [30, 60, 90]:
-        raise ValueError(f"Invalid configuration: {conversion_type} / {lookback_window}")
-    run_pipeline(conversion_type, lookback_window)
+    conversion_types = ["Trial", "Subscription"]
+    lookback_windows = [30, 60, 90]
+
+    for conv_type in conversion_types:
+        for window in lookback_windows:
+            print(f"\n🚀 Running: {conv_type} | {window}-day window")
+            try:
+                run_pipeline(conv_type, window)
+            except Exception as e:
+                print(f"❌ Failed: {conv_type} | {window}d | Error: {e}")
