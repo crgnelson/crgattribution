@@ -1,0 +1,9 @@
+version: 2
+
+models:
+  - name: stg_conv_visits
+    description: "Staging table from raw BI visit attribution"
+    columns:
+      - name: user_guid
+        tests:
+          - not_null

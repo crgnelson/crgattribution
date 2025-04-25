@@ -1,0 +1,11 @@
+version: 2
+
+sources:
+  - name: bi_layer_integration
+    database: ft-bi-team
+    schema: BI_Layer_Integration
+    tables:
+      - name: conv_visit_attribution
+        description: "User-level visit data with campaign and source metadata"
+      - name: known_user_daily_status
+        description: "User-level LTV and product metadata from BI layer"

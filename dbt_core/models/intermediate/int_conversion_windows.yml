@@ -1,0 +1,29 @@
+version: 2
+
+models:
+  - name: int_conversion_windows_30
+    description: "User-level visit data for 30-day lookback before conversion"
+    columns:
+      - name: user_guid
+        tests: [not_null]
+      - name: attribution_visit_start_time
+      - name: conversion_visit_timestamp
+      - name: touchpoint
+
+  - name: int_conversion_windows_60
+    description: "Same logic as 30-day but with 60-day lookback"
+    columns:
+      - name: user_guid
+        tests: [not_null]
+      - name: attribution_visit_start_time
+      - name: conversion_visit_timestamp
+      - name: touchpoint
+
+  - name: int_conversion_windows_90
+    description: "Same logic as above with 90-day window"
+    columns:
+      - name: user_guid
+        tests: [not_null]
+      - name: attribution_visit_start_time
+      - name: conversion_visit_timestamp
+      - name: touchpoint

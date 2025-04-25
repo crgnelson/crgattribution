@@ -1,0 +1,86 @@
+version: 2
+
+models:
+  - name: mkt_channel_level_agg
+    description: >
+      Cleaned and enriched channel-level attribution output from Python model.
+      Parses channel string into components and applies business rules for media type,
+      platform, and trial/direct segmentation. Ready for Looker dashboards or PCA decks.
+    columns:
+      - name: channels
+        description: "Original composite channel string, delimited by '|'"
+      - name: attribution_last_click_heuristic
+        description: "Attribution score from last-click model"
+      - name: attribution_markov_algorithmic
+        description: "Attribution score from Markov model"
+      - name: run_date
+        description: "Date this record was processed"
+        tests:
+          - not_null
+      - name: conversion_window
+        description: "Lookback window in days (30, 60, or 90)"
+        tests:
+          - not_null
+      - name: conversion_type
+        description: "Conversion type — Trial or Subscription"
+        tests:
+          - accepted_values:
+              values: ['Trial', 'Subscription']
+      - name: channel_name
+        description: "Simplified channel name extracted from channel path"
+      - name: channel_device_type
+        description: "Device type extracted from channel string"
+      - name: geo_country_name
+        description: "Country code from parsed channel string"
+      - name: user_cohort_primary
+        description: "User cohort or segmentation status"
+      - name: product_type
+        description: "Product or subscription category"
+      - name: cleaned_media_channel
+        description: "Media channel with business rules applied"
+      - name: cleaned_media_type
+        description: "Normalized media type (e.g., email → organic)"
+      - name: cleaned_platform
+        description: "Simplified platform name"
+      - name: trial_direct
+        description: "Final grouping — Trial, Directs, or Other"
+
+  - name: mkt_removal_effects_ltv_joined
+    description: >
+      Combines removal effect matrix with cleaned channel metadata and average LTV per channel.
+      Joins mkt_channel_level_agg with test_attribution_removal_effects to produce a 
+      dashboard-ready attribution signal weighted by channel importance and LTV.
+    columns:
+      - name: channel
+        description: "Original channel path string"
+      - name: run_date
+        description: "Date of model run"
+        tests:
+          - not_null
+      - name: conversion_window
+        description: "Lookback window in days"
+      - name: conversion_type
+        description: "Conversion type"
+        tests:
+          - accepted_values:
+              values: ['Trial', 'Subscription']
+      - name: average_ltv
+        description: "Mean LTV per channel across conversion window"
+      - name: removal_effect
+        description: "Channel's relative contribution to the conversion path"
+      - name: media_type
+        description: "Parsed media type from raw channel string"
+      - name: media_channel
+        description: "Parsed media channel"
+      - name: platform
+        description: "Parsed platform"
+      - name: channel_name
+        description: "Parsed simplified channel path"
+      - name: channel_device_type
+        description: "Parsed device type"
+      - name: geo_country_name
+        description: "Parsed geography"
+      - name: user_cohort_primary
+        description: "Parsed cohort"
+      - name: product_type
+        description: "Parsed product"

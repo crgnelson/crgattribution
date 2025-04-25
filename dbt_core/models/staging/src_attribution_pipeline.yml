@@ -1,0 +1,15 @@
+version: 2
+
+sources:
+  - name: attribution_pipeline
+    database: ft-customer-analytics
+    schema: crg_nniu_attribution
+    tables:
+      - name: test_attribution_markov_matrix
+        description: "Markov transition matrix output from Python attribution pipeline"
+      - name: test_attribution_user_df_all
+        description: "User-level attribution results with journey-level detail"
+      - name: test_attribution_removal_effects
+        description: "Normalized channel removal effects from Markov model"
+      - name: test_attribution_channel_level
+        description: "Aggregated attribution by channel and model"
