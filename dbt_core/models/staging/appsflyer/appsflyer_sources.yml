@@ -1,0 +1,9 @@
+version: 2
+
+sources:
+  - name: appsflyer
+    database: ft-data             # ✅ Read source from ft-data project
+    schema: appsflyer
+    tables:
+      - name: installs
+        description: "Raw installs data from Appsflyer"

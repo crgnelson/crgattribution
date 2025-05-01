@@ -21,7 +21,7 @@
       "name": "Run All Attribution Variants",
       "type": "python",
       "request": "launch",
-      "program": "${workspaceFolder}/attribution_docker/main_modular.py",
+      "program": "${workspaceFolder}/attribution_docker/attribution_pipeline.py",
       "console": "integratedTerminal"
     }
   ]

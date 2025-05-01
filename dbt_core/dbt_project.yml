@@ -9,9 +9,16 @@ macro-paths: ["macros"]
 
 models:
   my_marketing_pipeline:
+    +materialized: table
+
     staging:
-      +materialized: table
+      appsflyer: {}
+      attribution: {}
+
     intermediate:
-      +materialized: table
+      appsflyer: {}
+      attribution: {}
+
     marts:
-      +materialized: table
+      appsflyer: {}
+      attribution: {}

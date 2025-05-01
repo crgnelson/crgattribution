@@ -1,0 +1,33 @@
+version: 2
+
+models:
+  - name: stg_appsflyer__event_data
+    description: "Staged attribution events from Appsflyer, cleaned and scoped for downstream modeling"
+
+    columns:
+      - name: event_value
+        description: "Raw event payload, possibly JSON"
+      - name: event_source
+        description: "Attribution source, e.g., click or impression"
+      - name: media_source
+        description: "Marketing source: e.g., Facebook, Google"
+        tests:
+          - not_null
+      - name: campaign
+        description: "Campaign name assigned by advertiser"
+      - name: region
+        description: "Region where the event occurred"
+      - name: country_code
+        description: "Country ISO code"
+      - name: appsflyer_id
+        description: "Device identifier assigned by Appsflyer"
+      - name: user_id
+        description: "Mapped user ID from `customer_user_id`"
+        tests:
+          - not_null
+      - name: platform
+        description: "Device platform: iOS or Android"
+      - name: app_id
+        description: "Internal app identifier"
+      - name: app_name
+        description: "App name (human-readable)"

@@ -171,7 +171,14 @@ for current_date in pd.date_range(start_date, end_date, freq="D"):
 
         # Prepare df for merging
         df['conversion_visit_timestamp_date'] = df['conversion_visit_timestamp'].dt.date
-        product_arrangement_df = df[['user_guid', 'conversion_visit_timestamp_date', 'product_arrangement_id']].drop_duplicates()
+
+        product_arrangement_df = df[df['conversion_type'] == 'Subscription'][[
+        'user_guid',
+        'conversion_visit_timestamp_date',
+        'product_arrangement_id',
+        'is_app_conversion',
+        'product_type',
+         ]].drop_duplicates()
 
         # Merge user_df_temp with product_arrangement_df
         user_df_temp = user_df_temp.merge(
@@ -340,7 +347,14 @@ for current_date in pd.date_range(start_date, end_date, freq="D"):
     
         # Prepare df for merging
         df['conversion_visit_timestamp_date'] = df['conversion_visit_timestamp'].dt.date
-        product_arrangement_df = df[['user_guid', 'conversion_visit_timestamp_date', 'product_arrangement_id']].drop_duplicates()
+
+        product_arrangement_df = df[df['conversion_type'] == 'Subscription'][[
+        'user_guid',
+        'conversion_visit_timestamp_date',
+        'product_arrangement_id',
+        'is_app_conversion',
+        'product_type',
+         ]].drop_duplicates()
     
         # Merge user_df_temp with product_arrangement_df
         user_df_temp = user_df_temp.merge(
@@ -509,7 +523,14 @@ for current_date in pd.date_range(start_date, end_date, freq="D"):
     
         # Prepare df for merging
         df['conversion_visit_timestamp_date'] = df['conversion_visit_timestamp'].dt.date
-        product_arrangement_df = df[['user_guid', 'conversion_visit_timestamp_date', 'product_arrangement_id']].drop_duplicates()
+        
+        product_arrangement_df = df[df['conversion_type'] == 'Subscription'][[
+        'user_guid',
+        'conversion_visit_timestamp_date',
+        'product_arrangement_id',
+        'is_app_conversion',
+        'product_type',
+         ]].drop_duplicates()
     
         # Merge user_df_temp with product_arrangement_df
         user_df_temp = user_df_temp.merge(
@@ -759,7 +780,13 @@ for current_date in pd.date_range(start_date, end_date, freq="D"):
 
         # Prepare df for merging
         df['conversion_visit_timestamp_date'] = df['conversion_visit_timestamp'].dt.date
-        product_arrangement_df = df[['user_guid', 'conversion_visit_timestamp_date', 'product_arrangement_id']].drop_duplicates()
+        product_arrangement_df = df[df['conversion_type'] == 'Trial'][[
+        'user_guid',
+        'conversion_visit_timestamp_date',
+        'product_arrangement_id',
+        'is_app_conversion',
+        'product_type',
+         ]].drop_duplicates()
 
         # Merge user_df_temp with product_arrangement_df
         user_df_temp = user_df_temp.merge(
@@ -926,7 +953,14 @@ for current_date in pd.date_range(start_date, end_date, freq="D"):
 
         # Prepare df for merging
         df['conversion_visit_timestamp_date'] = df['conversion_visit_timestamp'].dt.date
-        product_arrangement_df = df[['user_guid', 'conversion_visit_timestamp_date', 'product_arrangement_id']].drop_duplicates()
+
+        product_arrangement_df = df[df['conversion_type'] == 'Trial'][[
+        'user_guid',
+        'conversion_visit_timestamp_date',
+        'product_arrangement_id',
+        'is_app_conversion',
+        'product_type',
+         ]].drop_duplicates()
 
         # Merge user_df_temp with product_arrangement_df
         user_df_temp = user_df_temp.merge(
@@ -1094,7 +1128,14 @@ for current_date in pd.date_range(start_date, end_date, freq="D"):
 
         # Prepare df for merging
         df['conversion_visit_timestamp_date'] = df['conversion_visit_timestamp'].dt.date
-        product_arrangement_df = df[['user_guid', 'conversion_visit_timestamp_date', 'product_arrangement_id']].drop_duplicates()
+
+        product_arrangement_df = df[df['conversion_type'] == 'Trial'][[
+        'user_guid',
+        'conversion_visit_timestamp_date',
+        'product_arrangement_id',
+        'is_app_conversion',
+        'product_type',
+         ]].drop_duplicates()
 
         # Merge user_df_temp with product_arrangement_df
         user_df_temp = user_df_temp.merge(
@@ -1345,7 +1386,14 @@ for current_date in pd.date_range(start_date, end_date, freq="D"):
 
         # Prepare df for merging
         df['conversion_visit_timestamp_date'] = df['conversion_visit_timestamp'].dt.date
-        product_arrangement_df = df[['user_guid', 'conversion_visit_timestamp_date', 'product_arrangement_id']].drop_duplicates()
+
+        product_arrangement_df = df[df['conversion_type'] == 'registration'][[
+        'user_guid',
+        'conversion_visit_timestamp_date',
+        'product_arrangement_id',
+        'is_app_conversion',
+        'product_type',
+         ]].drop_duplicates()
 
         # Merge user_df_temp with product_arrangement_df
         user_df_temp = user_df_temp.merge(
@@ -1562,7 +1610,14 @@ for current_date in pd.date_range(start_date, end_date, freq="D"):
 
         # Prepare df for merging
         df['conversion_visit_timestamp_date'] = df['conversion_visit_timestamp'].dt.date
-        product_arrangement_df = df[['user_guid', 'conversion_visit_timestamp_date', 'product_arrangement_id']].drop_duplicates()
+
+        product_arrangement_df = df[df['conversion_type'] == 'registration'][[
+        'user_guid',
+        'conversion_visit_timestamp_date',
+        'product_arrangement_id',
+        'is_app_conversion',
+        'product_type',
+         ]].drop_duplicates().drop_duplicates()
 
         # Merge user_df_temp with product_arrangement_df
         user_df_temp = user_df_temp.merge(
@@ -1779,7 +1834,14 @@ for current_date in pd.date_range(start_date, end_date, freq="D"):
 
         # Prepare df for merging
         df['conversion_visit_timestamp_date'] = df['conversion_visit_timestamp'].dt.date
-        product_arrangement_df = df[['user_guid', 'conversion_visit_timestamp_date', 'product_arrangement_id']].drop_duplicates()
+        
+        product_arrangement_df = df[df['conversion_type'] == 'registration'][[
+        'user_guid',
+        'conversion_visit_timestamp_date',
+        'product_arrangement_id',
+        'is_app_conversion',
+        'product_type',
+         ]].drop_duplicates()
 
         # Merge user_df_temp with product_arrangement_df
         user_df_temp = user_df_temp.merge(

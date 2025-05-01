@@ -83,7 +83,7 @@ def sanitize_column_name(col_name):
     return sanitized
 
 def run_pipeline(conversion_type, lookback_window):
-    table_id = f"ft-customer-analytics.crg_nniu.conversion_users_last_15_days_{lookback_window}_days_lookback_table"
+    table_id = f"ft-customer-analytics.crg_nniu_attribution.stg_conversion_users_last_15_days_{lookback_window}_days_lookback_table"
     user_df_all = pd.DataFrame()
     attribution_df_all = pd.DataFrame()
     markov_matrix_all = pd.DataFrame()
@@ -139,7 +139,7 @@ def run_pipeline(conversion_type, lookback_window):
             user_df["user_guid"] = user_df["journey_id"].str.extract(r'id:(.*)_J:\d+')[0]
 
             df["conversion_visit_timestamp_date"] = pd.to_datetime(df["conversion_visit_timestamp"]).dt.date
-            product_arrangement_df = df[["user_guid", "conversion_visit_timestamp_date", "product_arrangement_id"]].drop_duplicates()
+            product_arrangement_df = df[["user_guid", "conversion_visit_timestamp_date", "product_arrangement_id", "is_app_conversion"]].drop_duplicates()
             user_df = user_df.merge(
                 product_arrangement_df,
                 left_on=["user_guid", "run_date"],

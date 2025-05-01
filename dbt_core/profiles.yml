@@ -1,0 +1,10 @@
+dbt_core:
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      method: oauth
+      project: ft-customer-analytics
+      dataset: crg_nniu_attribution
+      location: EU
+      threads: 4
