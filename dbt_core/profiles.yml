@@ -1,4 +1,4 @@
-dbt_core:
+my_marketing_pipeline:
   target: dev
   outputs:
     dev:
