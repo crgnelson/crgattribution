@@ -1,0 +1,45 @@
+name: dbt CI/CD Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '12 12 * * *'  # every day at 6:30 AM UTC
+  workflow_dispatch:
+
+jobs:
+  run-dbt:
+    name: "Run dbt on BigQuery"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dbt-bigquery
+        run: pip install dbt-bigquery
+
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
+
+      - name: Write GCP credentials to file
+        run: echo "${{ secrets.GCP_CREDENTIALS }}" > creds.json
+
+      - name: Set environment variable for key
+        run: echo "GOOGLE_APPLICATION_CREDENTIALS=creds.json" >> $GITHUB_ENV
+
+      - name: Run dbt models
+        run: |
+          dbt deps --project-dir dbt_core --profiles-dir dbt_core --profile my_marketing_pipeline
+          dbt seed --project-dir dbt_core --profiles-dir dbt_core --profile my_marketing_pipeline --target dev
+          dbt run --project-dir dbt_core --profiles-dir dbt_core --profile my_marketing_pipeline --target dev --select staging.stg_conv_visits
+          dbt test --project-dir dbt_core --profiles-dir dbt_core --profile my_marketing_pipeline --target dev --select staging.stg_conv_visits
